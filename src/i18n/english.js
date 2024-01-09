@@ -1,8 +1,11 @@
 export default {
   toolbar: {
-    my_wallet: 'My Wallet',
-    create_wallet: 'Create Wallet',
-    transfer: 'Transfer',
+    my_wallet: 'My Wallet (L2)',
+    create_wallet: 'Create Wallet (L2)',
+    transfer: 'Transfer (L2)',
+    withdraw: 'Withdraw (L2 to L1)',
+    withdraw_history: 'Withdraw State',
+    deposit_address: 'Deposit Address (L1 to L2)',
     runes: 'Runes',
     contract: 'Contract',
     check_tx: 'Check Tx',
@@ -80,6 +83,7 @@ export default {
     memo_info: 'Memo',
     fee: 'Fee',
     transfer_right_now: 'Transfer immediately',
+    withdraw_right_now: 'Withdraw immediately',
     to_address: 'To Address',
     tx_making: 'Transaction is under construction',
     tx_making_and_will_refresh_after_done:

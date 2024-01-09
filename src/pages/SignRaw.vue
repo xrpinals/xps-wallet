@@ -23,8 +23,8 @@
             <el-switch
               style="width: 290px;"
               v-model="signRawForm.isTx"
-              active-text="交易签名"
-              inactive-text="文本签名"
+              active-text="Transaction signature"
+              inactive-text="Text signature"
             ></el-switch>
           </div>
           <div style="margin-top: 30pt;">

@@ -1,88 +1,96 @@
 <template>
   <div class="xps-account-balances-side-bar">
     <el-row style="margin-bottom: 20pt;">
-      <el-col :span="8">
+      <el-col :span="4">
         <div class="grid-content -balance-title-panel">
           <div class="label-font">
             {{ $t('accountBalances.wallet_balance') }}
           </div>
         </div>
       </el-col>
-      <el-col :span="16">
+      <!-- <el-col :span="16">
         <div class="grid-content -switch-panel">
           <el-switch v-model="hideZeroAssets"></el-switch>
           <span class="label-font">{{
             $t('accountBalances.hide_zero_balances')
           }}</span>
         </div>
+      </el-col> -->
+
+      <el-col :span="20">
+        <div class="-account-balances-panel">
+          <div
+            v-for="(balance, index) in filterBalances(
+              accountBalances,
+              hideZeroAssets,
+              showAccountBalancesLimit
+            )"
+            class="-account-balance"
+            :key="index"
+          >
+            <div class="-asset-symbol-label">{{ balance.assetSymbol }}</div>
+            <div class="-asset-amount-label">
+              {{ balance.amountNu.toFixed(balance.precision) }}
+            </div>
+          </div>
+          <div
+            v-if="
+              showAccountBalancesLimit &&
+                filterBalances(accountBalances, hideZeroAssets, null).length >
+                  showAccountBalancesLimit
+            "
+          >
+            <i
+              class="el-icon-arrow-down"
+              v-on:click="showAllBalances"
+              style="cursor: pointer;"
+            ></i>
+          </div>
+          <div class="clearfix"></div>
+        </div>
+        <div
+          class="-account-balances-panel"
+          v-if="accountTokenBalances.length > 0"
+        >
+          <h4 style="font-size: 16px; padding: 10px 0; color: #a99eb4;">
+            Tokens
+          </h4>
+          <div
+            v-for="(balance, index) in filterTokenBalances(
+              accountTokenBalances,
+              hideZeroAssets,
+              showAccountBalancesLimit
+            )"
+            class="-account-balance"
+            @click="toTransferToken(balance)"
+            :key="index"
+          >
+            <div class="-asset-symbol-label">{{ balance.token_symbol }}</div>
+            <div class="-asset-amount-label">
+              {{
+                (parseFloat(balance.amount) / balance.precision).toFixed(
+                  balance.precision.toString().length - 1
+                )
+              }}
+            </div>
+          </div>
+          <div
+            v-if="
+              showAccountBalancesLimit &&
+                filterTokenBalances(accountTokenBalances, hideZeroAssets, null)
+                  .length > showAccountBalancesLimit
+            "
+          >
+            <i
+              class="el-icon-arrow-down"
+              v-on:click="showAllBalances"
+              style="cursor: pointer;"
+            ></i>
+          </div>
+          <div class="clearfix"></div>
+        </div>
       </el-col>
     </el-row>
-    <div class="-account-balances-panel">
-      <div
-        v-for="(balance, index) in filterBalances(
-          accountBalances,
-          hideZeroAssets,
-          showAccountBalancesLimit
-        )"
-        class="-account-balance"
-        :key="index"
-      >
-        <div class="-asset-symbol-label">{{ balance.assetSymbol }}</div>
-        <div class="-asset-amount-label">
-          {{ balance.amountNu.toFixed(balance.precision) }}
-        </div>
-      </div>
-      <div
-        v-if="
-          showAccountBalancesLimit &&
-            filterBalances(accountBalances, hideZeroAssets, null).length >
-              showAccountBalancesLimit
-        "
-      >
-        <i
-          class="el-icon-arrow-down"
-          v-on:click="showAllBalances"
-          style="cursor: pointer;"
-        ></i>
-      </div>
-      <div class="clearfix"></div>
-    </div>
-    <div class="-account-balances-panel" v-if="accountTokenBalances.length > 0">
-      <h4 style="font-size: 16px; padding: 10px 0; color: #a99eb4;">Tokens</h4>
-      <div
-        v-for="(balance, index) in filterTokenBalances(
-          accountTokenBalances,
-          hideZeroAssets,
-          showAccountBalancesLimit
-        )"
-        class="-account-balance"
-        @click="toTransferToken(balance)"
-        :key="index"
-      >
-        <div class="-asset-symbol-label">{{ balance.token_symbol }}</div>
-        <div class="-asset-amount-label">
-          {{
-            (parseFloat(balance.amount) / balance.precision).toFixed(
-              balance.precision.toString().length - 1
-            )
-          }}
-        </div>
-      </div>
-      <div
-        v-if="
-          showAccountBalancesLimit &&
-            filterTokenBalances(accountTokenBalances, hideZeroAssets, null)
-              .length > showAccountBalancesLimit
-        "
-      >
-        <i
-          class="el-icon-arrow-down"
-          v-on:click="showAllBalances"
-          style="cursor: pointer;"
-        ></i>
-      </div>
-      <div class="clearfix"></div>
-    </div>
 
     <!-- begin dialogs -->
     <el-dialog
@@ -153,7 +161,7 @@
     components: {},
     data() {
       return {
-        hideZeroAssets: true,
+        hideZeroAssets: false,
         showAccountBalancesLimit: null,
         transferTokenForm: {},
         transferTokenDialogVisible: false,
@@ -274,7 +282,7 @@
       padding-right: 2px;
     }
     .-balance-title-panel {
-      text-align: left;
+      text-align: center;
     }
     .-switch-panel {
       text-align: right;

@@ -693,7 +693,7 @@
 <style lang="less">
   .xps-transfer-contract-container {
     min-width: 400px;
-    min-height: 381pt;
+    min-height: 350pt;
     background: inherit;
     width: calc(100% - 117pt);
     float: right;
@@ -713,7 +713,7 @@
     .-left-side {
       width: 70%;
       background: white;
-      min-height: 381pt;
+      min-height: 350pt;
       // padding: 0 20pt;
     }
     .el-input-group--append {
@@ -732,7 +732,7 @@
       float: right;
       text-align: left;
       background: white;
-      min-height: 381pt;
+      min-height: 350pt;
       margin-left: 10pt;
       padding: 20pt;
     }

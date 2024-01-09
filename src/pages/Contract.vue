@@ -303,7 +303,7 @@
 <style lang="less">
   .xps-contract-container {
     min-width: 400px;
-    min-height: 381pt;
+    min-height: 350pt;
     background: inherit;
     padding-top: 0;
     .label-font {
@@ -319,7 +319,7 @@
       width: calc(70% - 116pt);
       float: left;
       background: white;
-      min-height: 381pt;
+      min-height: 350pt;
     }
     .-right-side {
       width: calc(30% - 10pt);
@@ -327,7 +327,7 @@
       float: right;
       text-align: left;
       background: white;
-      min-height: 381pt;
+      min-height: 350pt;
       margin-left: 10pt;
       padding: 20pt;
     }

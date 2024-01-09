@@ -144,8 +144,6 @@ export default {
     return true
   },
   base58ToBytes(S) {
-    // 把base58格式字符串转换成bytes
-    // @param S base58格式的字符串
     const A = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
     var d = [], //the array for storing the stream of decoded bytes
       b = [], //the result byte array that will be returned
@@ -190,8 +188,6 @@ export default {
     return true
   },
   wifToHex(wifStr) {
-    // WIF格式私钥转换成hex格式私钥
-    // WIF格式是base58+4位checksum,checksum是私钥bytes的两次sha256
     if (!wifStr || wifStr.length < 4) {
       throw new Error('invalid WIF format')
     }
@@ -245,7 +241,6 @@ export default {
     amount: 0,
   },
   localSetItem(key, value) {
-    // TODO: 本地缓存记录存储时间，用于短期cache的时候太早数据不使用
     if (window.localStorage) {
       const network = appState.getCurrentNetwork()
       localStorage.setItem(`${network}.${key}`, JSON.stringify(value))

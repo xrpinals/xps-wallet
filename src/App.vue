@@ -9,6 +9,13 @@
         v-if="currentTabKey === 'register_account'"
       ></RegisterAccount>
       <Transfer v-if="currentTabKey === 'transfer'"></Transfer>
+      <Withdraw v-if="currentTabKey === 'withdraw'"></Withdraw>
+      <WithdrawHistory
+        v-if="currentTabKey === 'withdraw_history'"
+      ></WithdrawHistory>
+      <DepositAddress
+        v-if="currentTabKey === 'deposit_address'"
+      ></DepositAddress>
       <CheckTx v-if="currentTabKey === 'check_tx'"></CheckTx>
       <SignRaw v-if="currentTabKey === 'sign_raw'"></SignRaw>
       <BroadcastTx v-if="currentTabKey === 'broadcast_tx'"></BroadcastTx>
@@ -29,6 +36,9 @@
   import RegisterAccount from './pages/RegisterAccount.vue'
   import CreateWallet from './pages/CreateWallet.vue'
   import Transfer from './pages/Transfer.vue'
+  import Withdraw from './pages/Withdraw.vue'
+  import WithdrawHistory from './pages/WithdrawHistory.vue'
+  import DepositAddress from './pages/DepositAddress.vue'
   import CheckTx from './pages/CheckTx.vue'
   import SignRaw from './pages/SignRaw.vue'
   import BroadcastTx from './pages/BroadcastTx.vue'
@@ -45,6 +55,9 @@
       CreateWallet,
       RegisterAccount,
       Transfer,
+      Withdraw,
+      WithdrawHistory,
+      DepositAddress,
       CheckTx,
       SignRaw,
       BroadcastTx,
@@ -104,10 +117,14 @@
     display: none;
   }
 
+  body {
+    width: 600px;
+  }
+
   .xps-main-container {
-    max-width: 1000px;
-    margin: 0 auto;
-    margin-top: 8px;
+    width: 1000px;
+    max-width: calc(100% - 40px);
+    margin: 20px;
     background: white;
     padding: 20px;
   }
@@ -122,13 +139,13 @@
   }
 
   #app {
+    width: 600px;
     font-family: 'Avenir', Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-align: center;
-    min-width: 400px;
     min-height: 500px;
-    background: #fff;
+    background: #eee;
   }
 
   .xps-footer-bar {
@@ -238,14 +255,12 @@
     }
   }
 
-  .grid-content {
-    word-break: break-all;
+  .el-table--enable-row-hover .el-table__body tr:hover > td.el-table__cell {
+    background-color: #fff;
   }
 
-  .chrome-ext-app-container {
-    .xps-main-container {
-      width: 500px;
-    }
+  .grid-content {
+    word-break: break-all;
   }
 
   ::placeholder {

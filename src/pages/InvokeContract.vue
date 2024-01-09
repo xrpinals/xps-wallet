@@ -723,7 +723,7 @@
 <style lang="less">
   .xps-invoke-contract-container {
     min-width: 400px;
-    min-height: 381pt;
+    min-height: 350pt;
     background: inherit;
     padding-top: 0;
     width: calc(100% - 117pt);
@@ -744,7 +744,7 @@
     .-left-side {
       width: 100%;
       background: white;
-      min-height: 381pt;
+      min-height: 350pt;
       padding: 0 20pt;
     }
     .el-input-group--append {
@@ -763,7 +763,7 @@
       float: right;
       text-align: left;
       background: white;
-      min-height: 381pt;
+      min-height: 350pt;
       margin-left: 10pt;
       padding: 20pt;
     }

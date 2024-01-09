@@ -1,8 +1,7 @@
 <template>
   <div>
     <div class="xps-main-container xps-transfer-container">
-      <!-- transfer panel -->
-      <div class="-left-side" v-if="step === 'transfer'">
+      <div class="-left-side" v-if="step === 'withdraw'">
         <el-form
           :model="transferForm"
           status-icon
@@ -17,12 +16,6 @@
 
           <el-form-item v-bind:label="$t('accountBalances.wallet_balance')">
             <div style="padding-left: 15px;" class="grid-content">
-              <!-- <div style="display: flex;align-items: center;gap:15px">
-                <el-switch v-model="hideZeroAssets"></el-switch>
-                <span class="label-font">{{
-                  $t('accountBalances.hide_zero_balances')
-                }}</span>
-              </div> -->
               <div
                 style="display: flex;align-items: center;gap:15px;flex-wrap: wrap;"
               >
@@ -88,7 +81,7 @@
             </div>
           </el-form-item>
           <el-form-item v-bind:label="$t('transferPage.fee')" prop="feeAmount">
-            <span class="label-font">0.000001BTC</span>
+            <span class="label-font">{{ fee }} BTC</span>
           </el-form-item>
 
           <el-form-item>
@@ -97,7 +90,7 @@
               class="xpswallet-form-btn"
               v-on:click="transfer"
               style="margin-left: -50pt;"
-              >{{ $t('transferPage.transfer_right_now') }}</el-button
+              >{{ $t('transferPage.withdraw_right_now') }}</el-button
             >
           </el-form-item>
         </el-form>
@@ -143,7 +136,7 @@
               </el-col>
               <el-col :span="16">
                 <div class="grid-content label-font value-label">
-                  0.000001BTC
+                  {{ fee }} BTC
                 </div>
               </el-col>
             </el-row>
@@ -152,7 +145,7 @@
             <el-button
               class="xpswallet-form-btn"
               type="primary"
-              @click="doTransfer"
+              @click="doWithdraw"
               >{{ $t('dialogs.confirm') }}</el-button
             >
           </span>
@@ -160,7 +153,7 @@
       </div>
 
       <!-- transfer_sent panel -->
-      <div class="-left-side" v-if="step === 'transfer_sent'">
+      <div class="-left-side" v-if="step === 'withdraw_sent'">
         <div style="color: #261932; font-size: 12pt; margin-top: 30pt;">
           {{ $t('transferPage.tx_making') }}
         </div>
@@ -187,7 +180,7 @@
       </div>
 
       <!-- transfer_fail panel -->
-      <div class="-left-side" v-if="step === 'transfer_fail'">
+      <div class="-left-side" v-if="step === 'withdraw_fail'">
         <div style="color: #261932; font-size: 12pt; margin-top: 30pt;">
           {{ $t('transferPage.tx_failed') }}
         </div>
@@ -217,7 +210,7 @@
       </div>
 
       <!-- transfer_success panel -->
-      <div class="-left-side" v-if="step === 'transfer_success'">
+      <div class="-left-side" v-if="step === 'withdraw_success'">
         <div style="color: #261932; font-size: 12pt; margin-top: 30pt;">
           {{ $t('transferPage.tx_success') }}
         </div>
@@ -247,6 +240,7 @@
 </template>
 
 <script>
+  import axios from 'axios'
   import _ from 'lodash'
   import appState from '../appState'
   import utils from '../utils'
@@ -256,7 +250,7 @@
   let { PrivateKey, key, TransactionBuilder, TransactionHelper } = xps_js
 
   export default {
-    name: 'Transfer',
+    name: 'Withdraw',
     components: { KeystoreInput, AddressOrSelectWalletInput, AssetInput },
     data() {
       return {
@@ -264,7 +258,7 @@
         lastSentTxId: null,
         transferFailError: null,
         showConfirmDialog: false,
-        step: 'transfer', // transfer, transfer_sent, transfer_success, transfer_fail
+        step: 'withdraw', // withdraw, withdraw_sent, withdraw_success, withdraw_fail
         walletUnlocked: false,
         hideZeroAssets: false,
         transferForm: {
@@ -274,9 +268,11 @@
         currentAccountBalances: [],
         currentAccountInfo: {},
         closeTimeoutMilli: 5000,
+        hourFee: 100,
       }
     },
     created() {
+      this.getHourFee()
       let account = appState.getCurrentAccount()
       const walletInfo = appState.getWalletInfo()
       this.addresses = !!walletInfo ? walletInfo.addresses : []
@@ -288,6 +284,13 @@
       } else {
         this.walletUnlocked = false
       }
+    },
+    computed: {
+      fee: function() {
+        return `0.00001 ~ ${new BigNumber(this.hourFee || 100)
+          .multipliedBy(600)
+          .dividedBy(new BigNumber(10).pow(8))}`
+      },
     },
     mounted() {
       appState.onChangeCurrentAccount(this.onChangeCurrentAccount)
@@ -308,6 +311,17 @@
       }
     },
     methods: {
+      getHourFee() {
+        axios
+          .get('https://mempool.space/api/v1/fees/recommended', {
+            headers: { 'Content-Type': 'application/json' },
+          })
+          .then((data) => {
+            if (!!data && !!data.data) {
+              this.hourFee = data.data.hourFee
+            }
+          })
+      },
       onFlashTxMessage(txMsg) {
         this.transferForm.transferAssetId = txMsg.currency || '1.3.0'
         this.transferForm.amount = txMsg.valueRaw
@@ -371,7 +385,8 @@
                         )
                       : new BigNumber(0),
                   }
-                  this.currentAccountBalances.push(item)
+                  item.assetId === '1.3.0' &&
+                    this.currentAccountBalances.push(item)
                 }
                 return balances
               })
@@ -402,7 +417,7 @@
         this.transferForm.amount = 0
         this.transferForm.memo = ''
         this.transferForm.transferAssetId = '1.3.0'
-        this.step = 'transfer'
+        this.step = 'withdraw'
       },
       toViewTx(txId) {
         appState.changeCurrentTab('check_tx', [txId])
@@ -440,6 +455,14 @@
           this.showError(this.$t('transferPage.invalid_transfer_amount_format'))
           return
         }
+
+        if (!amountNu.isGreaterThan(0.00118)) {
+          this.showError(
+            'The withdrawal amount cannot be less than 0.00118 BTC'
+          )
+          return
+        }
+
         if (
           !utils.haveEnoughBalance(
             amountNu,
@@ -451,6 +474,7 @@
           this.showError(this.$t('transferPage.not_enough_balance'))
           return
         }
+
         if (!toAddress) {
           this.showError('Empty Address or account name')
           return
@@ -466,7 +490,7 @@
       closeConfirmDialog() {
         this.showConfirmDialog = false
       },
-      doTransfer: _.throttle(function() {
+      doWithdraw: _.throttle(function() {
         this.showConfirmDialog = false
         let form = this.transferForm
         let toAddress = (form.toAddress || '').trim()
@@ -475,9 +499,8 @@
         let assetId = form.transferAssetId
         let asset = appState.getAssetLocal(assetId)
         let memo = (form.memo || '').trim()
-        let amountFull = parseInt(
-          amountNu.multipliedBy(Math.pow(10, asset.precision)).toFixed(0)
-        )
+        let amountFull = amountNu.toString()
+
         this.addresses
         const pkey = PrivateKey.fromBuffer(this.currentAccount.getPrivateKey())
         const pubKey = pkey.toPublicKey()
@@ -488,18 +511,18 @@
               .withApis()
               .then(() => {
                 let tr = new TransactionBuilder()
-                let op = TransactionHelper.new_transfer_operation(
+                let op = TransactionHelper.new_cross_chain_withdraw_operation(
                   this.currentAccount.address,
                   toAddress,
                   amountFull,
-                  assetId,
                   memo
                 )
-                tr.add_type_operation('transfer', op)
+                tr.add_type_operation('crosschain_withdraw', op)
                 tr.set_expire_seconds(500)
                 return tr.set_required_fees().then(() => {
                   return tr.finalize().then(() => tr)
                 })
+                // return tr.finalize().then(() => tr)
               })
               .then((tr) => {
                 tr.add_signer(pkey, pubKey)
@@ -520,7 +543,7 @@
                     setTimeout(() => {
                       this.getTransaction(txid)
                         .then((tx) => {
-                          this.step = 'transfer_success'
+                          this.step = 'withdraw_success'
                           this.loadCurrentAccountInfo()
                           if (utils.isChromeExtension()) {
                             this.closeTimer = setTimeout(() => {
@@ -532,7 +555,7 @@
                           }
                         })
                         .catch((e) => {
-                          this.step = 'transfer_fail'
+                          this.step = 'withdraw_fail'
                           this.transferFailError = this.$t(
                             'contractPage.tx_not_on_chain_please_query_later'
                           )
@@ -540,11 +563,11 @@
                     }, 6000)
                   })
                   .catch((e) => {
-                    this.step = 'transfer_fail'
+                    this.step = 'withdraw_fail'
                     this.transferFailError = e.toString()
                   })
 
-                this.step = 'transfer_sent'
+                this.step = 'withdraw_sent'
               })
               .catch(this.showError)
           })

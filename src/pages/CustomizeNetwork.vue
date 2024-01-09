@@ -117,7 +117,6 @@
           return
         }
         appState.setLocalNetwork(url, chainId)
-        // TODO: 通知background.js去更新js
         window.location.reload()
       },
     },

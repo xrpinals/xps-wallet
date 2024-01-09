@@ -151,6 +151,25 @@ function setCurrentAccount() {
   }
 }
 
+async function unLock(pwd) {
+  try {
+    state.currentPwd = pwd
+    state.currentWalletInfo = await getWalletInfoByPwd(pwd)
+
+    if (typeof chrome !== 'undefined' && chrome.storage) {
+      await chrome.storage.session.set({ pwd: state.currentWalletInfo.pwd })
+    } else {
+      if (typeof sessionStorage !== 'undefined') {
+        sessionStorage.setItem('pwd', state.currentWalletInfo.pwd)
+      }
+    }
+
+    return Promise.resolve(state.currentWalletInfo.account)
+  } catch (error) {
+    return Promise.reject('Incorrect password')
+  }
+}
+
 setCurrentAccount()
 
 const changeCurrentTabEventName = 'changeCurrentTab'
@@ -238,6 +257,15 @@ async function saveWalletInfo(pwd, walletInfo) {
         localStorage.setItem('walletInfo', encryptWalletData)
       }
     }
+
+    if (typeof chrome !== 'undefined' && chrome.storage) {
+      await chrome.storage.session.set({ pwd: walletInfo.pwd })
+    } else {
+      if (typeof sessionStorage !== 'undefined') {
+        sessionStorage.setItem('pwd', walletInfo.pwd)
+      }
+    }
+
     state.currentWalletInfo = walletInfo
     state.currentAccount = state.currentWalletInfo.account
     state.currentAddress = state.currentWalletInfo.account.address
@@ -471,15 +499,25 @@ export default {
     walletInfo.account.address = address
     saveWalletInfo(walletInfo.pwd, walletInfo)
   },
-  async unLock(pwd) {
+  async unLockWithSessionStorage() {
     try {
-      state.currentPwd = pwd
-      state.currentWalletInfo = await getWalletInfoByPwd(pwd)
-      return Promise.resolve(state.currentWalletInfo.account)
-    } catch (error) {
-      return Promise.reject('Incorrect password')
-    }
+      let pwd
+      if (typeof chrome !== 'undefined' && chrome.storage) {
+        const data = await chrome.storage.session.get('pwd')
+        pwd = !!data ? data.pwd : undefined
+      } else {
+        if (typeof sessionStorage !== 'undefined') {
+          pwd = sessionStorage.getItem('pwd')
+        }
+      }
+      if (!!!pwd) {
+        return Promise.resolve('')
+      }
+      const account = await unLock(pwd)
+      return Promise.resolve(account)
+    } catch (error) {}
   },
+  unLock,
   changeAddress(address) {
     if (state.currentAccount.address === address) return
 

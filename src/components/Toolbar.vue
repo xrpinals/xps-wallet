@@ -1,7 +1,9 @@
 <template>
   <div class="toolbar-wrapper">
-    <el-row style="max-width: 1000px; margin: 0 auto;">
-      <el-col v-for="tab in tabs" :key="tab.key" :span="tab.span">
+    <el-row
+      style="width: 100%;display: flex;align-items: center;padding: 0 10px;flex-wrap: wrap;"
+    >
+      <div v-for="tab in tabs" :key="tab.key">
         <div
           class="xps-toolbar-item"
           v-on:click="changeToolbarTab(tab)"
@@ -13,7 +15,7 @@
             :style="{ background: 'images/toolbar-border.png' }"
           ></div>
         </div>
-      </el-col>
+      </div>
     </el-row>
   </div>
 </template>
@@ -30,6 +32,13 @@
           { label: 'toolbar.my_wallet', key: 'my_wallet', span: 4 },
           // { label: 'toolbar.create_wallet', key: 'create_wallet', span: 4 },
           { label: 'toolbar.transfer', key: 'transfer', span: 4 },
+          { label: 'toolbar.withdraw', key: 'withdraw', span: 5 },
+          {
+            label: 'toolbar.withdraw_history',
+            key: 'withdraw_history',
+            span: 4,
+          },
+          { label: 'toolbar.deposit_address', key: 'deposit_address', span: 6 },
           // {
           //   label: 'toolbar.runes',
           //   key: 'runes',
@@ -58,11 +67,12 @@
 
 <style lang="less" scoped>
   .toolbar-wrapper {
-    height: 29pt;
+    height: 100%;
     line-height: 27pt;
     font-size: 8pt;
     background: white;
     .xps-toolbar-item {
+      padding: 0 12px;
       margin: 0 auto;
     }
     .xps-toolbar-item:hover {

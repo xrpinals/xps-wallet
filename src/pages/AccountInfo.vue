@@ -249,8 +249,8 @@
     }
     .xps-account-balances-side-bar {
       .-balance-title-panel {
-        text-align: left;
-        padding-left: 50pt;
+        text-align: center;
+        // padding-left: 50pt;
       }
       .-switch-panel {
         text-align: right;

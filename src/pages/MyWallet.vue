@@ -6,6 +6,7 @@
           :model="unlockWalletForm"
           ref="unlockWalletForm"
           class="xps-my-wallet-inner-container"
+          @submit.native.prevent
         >
           <el-form-item prop="password">
             <el-input
@@ -15,7 +16,7 @@
               type="password"
               v-model="unlockWalletForm.password"
               style="width: 100pt;"
-              @keyup.enter.native="onUnlock()"
+              @keyup.enter.native="onUnlock"
             ></el-input>
           </el-form-item>
           <el-form-item>
@@ -208,6 +209,8 @@
       } else {
         this.opened = false
       }
+
+      this.onUnlock('withSessionStorage')
     },
     computed: {
       validPwd: function() {
@@ -421,24 +424,36 @@
           this.showError(e)
         }
       },
-      async onUnlock() {
-        this.unlockWalletForm.password = this.unlockWalletForm.password.trim()
-        if (
-          this.unlockWalletForm.password.length < 8 ||
-          this.unlockWalletForm.password.length > 30
-        ) {
-          this.showError(
-            this.$t('keystoreInput.wallet_password_length_invalid')
-          )
-          return
+      async onUnlock(tpye = 'withPwd') {
+        const isExistWallet = await appState.isExistWallet()
+        if (!isExistWallet) return
+
+        if (tpye !== 'withSessionStorage') {
+          this.unlockWalletForm.password = this.unlockWalletForm.password.trim()
+          if (
+            this.unlockWalletForm.password.length < 8 ||
+            this.unlockWalletForm.password.length > 30
+          ) {
+            this.showError(
+              this.$t('keystoreInput.wallet_password_length_invalid')
+            )
+            return
+          }
         }
+
         try {
           let password = this.unlockWalletForm.password
-          const currentAccount = await appState.unLock(password)
-          appState.changeCurrentAccount(currentAccount)
-          this.currentAccount = currentAccount
-          this.loadCurrentAccountInfo()
-          this.opened = true
+          const currentAccount =
+            tpye === 'withSessionStorage'
+              ? await appState.unLockWithSessionStorage()
+              : await appState.unLock(password)
+
+          if (!!currentAccount) {
+            appState.changeCurrentAccount(currentAccount)
+            this.currentAccount = currentAccount
+            this.loadCurrentAccountInfo()
+            this.opened = true
+          }
         } catch (error) {
           this.showError(error)
         }
@@ -485,8 +500,8 @@
     }
     .xps-account-balances-side-bar {
       .-balance-title-panel {
-        text-align: left;
-        padding-left: 50pt;
+        text-align: center;
+        // padding-left: 50pt;
       }
       .-switch-panel {
         text-align: right;
@@ -501,8 +516,7 @@
     }
   }
   .xps-my-wallet-container {
-    min-width: 400px;
-    min-height: 266pt;
+    min-height: 310pt;
   }
   .xps-my-wallet-inner-container {
     width: 400pt;

@@ -47,12 +47,12 @@
           </el-col>
         </el-row>
         <el-row class="-balance-label-row">
-          <el-col :span="4">
+          <el-col :span="24">
             <div class="grid-content label-font">
               {{ $t('contractPage.balance') }}
             </div>
           </el-col>
-          <el-col :span="8">
+          <!-- <el-col :span="8">
             <div class="grid-content label-font">&nbsp;</div>
           </el-col>
           <el-col :span="8">
@@ -67,7 +67,7 @@
                 }}</span>
               </div>
             </div>
-          </el-col>
+          </el-col> -->
         </el-row>
         <div class="-account-balances-panel">
           <div
