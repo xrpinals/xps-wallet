@@ -38,7 +38,7 @@
             key: 'withdraw_history',
             span: 4,
           },
-          { label: 'toolbar.deposit_address', key: 'deposit_address', span: 6 },
+          { label: 'toolbar.deposit', key: 'deposit', span: 6 },
           // {
           //   label: 'toolbar.runes',
           //   key: 'runes',

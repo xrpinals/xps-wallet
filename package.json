@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@bitcoin-js/tiny-secp256k1-asmjs": "^2.2.3",
+    "@mempool/mempool.js": "^2.3.0",
     "axios": "^0.19.0",
     "bip32": "^4.0.0",
     "bip39": "^3.1.0",

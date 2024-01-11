@@ -39,6 +39,12 @@
             </div>
           </el-form-item>
 
+          <div
+            style="font-size: 8pt;width: 100%;color: red;text-align: left;margin: 0 0 0 16px;"
+          >
+            * only support the legacy format bitcoin address(starting with "1")
+            at present
+          </div>
           <el-form-item
             v-bind:label="$t('transferPage.send_to_address')"
             prop="toAddress"

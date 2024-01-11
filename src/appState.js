@@ -6,16 +6,18 @@ const bip39 = require('bip39')
 const bitcoin = require('bitcoinjs-lib')
 const ecc = require('@bitcoin-js/tiny-secp256k1-asmjs')
 
+const IS_PROD = true
+
 const EE = new EventEmitter()
 
 const networkList = [
   {
-    chainId: '5790bf95b0fc2531eb44bdfe6032f60afb3649b781c4152ee197eb927749c404',
-    // chainId: 'ae54f23a9ba5221f90fcd9e694b3e73fcff8bc2cc028d69a724f046a8e293713', //testnet
+    chainId: IS_PROD
+      ? '5790bf95b0fc2531eb44bdfe6032f60afb3649b781c4152ee197eb927749c404'
+      : 'ae54f23a9ba5221f90fcd9e694b3e73fcff8bc2cc028d69a724f046a8e293713',
     key: 'mainnet',
     name: 'Mainnet',
-    url: 'ws://api.xrpinals.com:1223',
-    // url: 'ws://121.5.130.149:8910', //testnet
+    url: IS_PROD ? 'ws://api.xrpinals.com:1223' : 'ws://121.5.130.149:8910',
   },
 ]
 
@@ -98,21 +100,10 @@ const state = {
   tokenExplorerApiUrl: 'http://106.12.185.216/graphql',
 }
 
-// TODO: read current account from chrome.storage
-
-let {
-  PrivateKey,
-  key,
-  TransactionBuilder,
-  TransactionHelper,
-  NodeClient,
-} = xps_js
+let { NodeClient } = xps_js
 let { Apis, ChainConfig } = xps_js.bitshares_ws
 
-// TODO: read last used chainId or default
-ChainConfig.setChainId(
-  'ae54f23a9ba5221f90fcd9e694b3e73fcff8bc2cc028d69a724f046a8e293713'
-)
+ChainConfig.setChainId(networkList[0].chainId)
 
 function setStorage(key, value) {
   if (typeof localStorage !== 'undefined') {
@@ -127,27 +118,6 @@ function getStorage(key) {
     try {
       return localStorage.getItem(key)
     } catch (e) {}
-  }
-}
-
-function setCurrentAccount() {
-  if (typeof localStorage !== 'undefined') {
-    try {
-      let fileJson = localStorage.getItem('keyInfo')
-      let password = localStorage.getItem('keyPassword')
-      if (fileJson && fileJson !== 'null' && password) {
-        fileJson = JSON.parse(fileJson)
-        let account = account_utils.NewAccount()
-        account.fromKey(fileJson, password)
-        account.address = null
-        let address = account.getAddressString('')
-        account.address = address
-        state.currentAccount = account
-        state.currentAddress = address
-      }
-    } catch (e) {
-      console.error(e)
-    }
   }
 }
 
@@ -170,8 +140,6 @@ async function unLock(pwd) {
   }
 }
 
-setCurrentAccount()
-
 const changeCurrentTabEventName = 'changeCurrentTab'
 const changeCurrentNetworkEventName = 'changeCurrentNetwork'
 const changeCurrentLanguageEventName = 'changeCurrentLanguage'
@@ -190,19 +158,6 @@ function getLocationHash() {
   } else {
     return ''
   }
-}
-
-function parseQuery(queryString) {
-  var query = {}
-  var pairs = (queryString[0] === '?'
-    ? queryString.substr(1)
-    : queryString
-  ).split('&')
-  for (var i = 0; i < pairs.length; i++) {
-    var pair = pairs[i].split('=')
-    query[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1] || '')
-  }
-  return query
 }
 
 // receive params
@@ -341,12 +296,6 @@ function changeCurrentNetwork(network) {
     }
     ChainConfig.setChainId(networkObj.chainId)
     ChainConfig.address_prefix = networkObj.address_prefix || ''
-    if (state.currentAccount) {
-      let account = state.currentAccount
-      account.address = null
-      let address = account.getAddressString(ChainConfig.address_prefix)
-      account.address = address
-    }
   }
   EE.emit(changeCurrentNetworkEventName, state.currentNetwork)
   if (oldNetwork && oldNetwork != network) {
@@ -357,10 +306,9 @@ function changeCurrentNetwork(network) {
 }
 
 export default {
+  IS_PROD,
   EE,
   precision: 8,
-  mainnetChainId:
-    '2e13ba07b457f2e284dcfcbd3d4a3e4d78a6ed89a61006cdb7fdad6d67ef0b12',
   pushFlashTx(txMsg) {
     state.flashTxMessage = txMsg
     if (txMsg) {
@@ -458,7 +406,7 @@ export default {
     const publicKey = keyPair.publicKey
 
     const { address } = bitcoin.payments.p2pkh({
-      // network: bitcoin.networks.testnet,
+      network: IS_PROD ? bitcoin.networks.bitcoin : bitcoin.networks.testnet,
       pubkey: publicKey,
     })
 
@@ -485,7 +433,7 @@ export default {
     }
     const publicKey = keyPair.publicKey
     const { address } = bitcoin.payments.p2pkh({
-      // network: bitcoin.networks.testnet,
+      network: IS_PROD ? bitcoin.networks.bitcoin : bitcoin.networks.testnet,
       pubkey: publicKey,
     })
 

@@ -13,9 +13,7 @@
       <WithdrawHistory
         v-if="currentTabKey === 'withdraw_history'"
       ></WithdrawHistory>
-      <DepositAddress
-        v-if="currentTabKey === 'deposit_address'"
-      ></DepositAddress>
+      <Deposit v-if="currentTabKey === 'deposit'"></Deposit>
       <CheckTx v-if="currentTabKey === 'check_tx'"></CheckTx>
       <SignRaw v-if="currentTabKey === 'sign_raw'"></SignRaw>
       <BroadcastTx v-if="currentTabKey === 'broadcast_tx'"></BroadcastTx>
@@ -38,7 +36,7 @@
   import Transfer from './pages/Transfer.vue'
   import Withdraw from './pages/Withdraw.vue'
   import WithdrawHistory from './pages/WithdrawHistory.vue'
-  import DepositAddress from './pages/DepositAddress.vue'
+  import Deposit from './pages/Deposit.vue'
   import CheckTx from './pages/CheckTx.vue'
   import SignRaw from './pages/SignRaw.vue'
   import BroadcastTx from './pages/BroadcastTx.vue'
@@ -57,7 +55,7 @@
       Transfer,
       Withdraw,
       WithdrawHistory,
-      DepositAddress,
+      Deposit,
       CheckTx,
       SignRaw,
       BroadcastTx,
@@ -205,7 +203,6 @@
 
   .el-button--default:focus,
   .el-button--default:hover {
-    color: #8a7ee7;
     border-color: #e4deff;
     background-color: #f4f0ff;
   }
@@ -227,6 +224,44 @@
   .el-dropdown-menu__item:not(.is-disabled):hover {
     color: #8a7ee7;
     background: #f4f0ff;
+  }
+
+  .el-radio__input.is-checked .el-radio__inner {
+    border-color: #8a7ee7;
+    background: #8a7ee7;
+  }
+
+  .el-form-item__content .el-input input {
+    font-size: 8pt !important;
+  }
+
+  .el-radio__input.is-checked + .el-radio__label {
+    color: #8a7ee7;
+  }
+
+  .el-radio__input {
+    height: 12px;
+  }
+
+  .el-radio__label {
+    padding-left: 4px;
+  }
+
+  .el-radio {
+    margin-right: 12px;
+  }
+
+  .el-avatar,
+  .el-cascader-panel,
+  .el-radio,
+  .el-radio--medium.is-bordered .el-radio__label,
+  .el-radio__label {
+    font-size: 8pt;
+  }
+
+  .el-radio__inner {
+    width: 10px;
+    height: 10px;
   }
 
   .el-switch__core {
@@ -261,6 +296,10 @@
 
   .grid-content {
     word-break: break-all;
+  }
+
+  a {
+    color: #6555df;
   }
 
   ::placeholder {

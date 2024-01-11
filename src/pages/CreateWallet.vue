@@ -208,7 +208,9 @@
       async generateAccount() {
         const pwd = this.createWalletForm.password.trim()
         const { address } = bitcoin.payments.p2pkh({
-          // network: bitcoin.networks.testnet,
+          network: appState.IS_PROD
+            ? bitcoin.networks.bitcoin
+            : bitcoin.networks.testnet,
           pubkey: this.createWalletData.publicKey,
         })
         let account = account_utils.NewAccount(this.createWalletData.privateKey)

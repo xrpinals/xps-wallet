@@ -5,7 +5,7 @@ export default {
     transfer: 'Transfer (L2)',
     withdraw: 'Withdraw (L2 to L1)',
     withdraw_history: 'Withdraw State',
-    deposit_address: 'Deposit Address (L1 to L2)',
+    deposit: 'Deposit (L1 to L2)',
     runes: 'Runes',
     contract: 'Contract',
     check_tx: 'Check Tx',
